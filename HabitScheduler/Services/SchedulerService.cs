@@ -52,6 +52,8 @@ namespace HabitScheduler.Services
                         StartTime = start.Value,
                         DurationMinutes = habit.MinDurationMinutes,
                     };
+
+                    habit.ScheduledSlots.Add(slot);
                     _dbContext.ScheduleSlots.Add(slot);
 
                     slotsToSchedule--;
@@ -68,7 +70,7 @@ namespace HabitScheduler.Services
                 .OrderBy(s => s.StartTime)
                 .ToList();
 
-            for (int hour = habit.StartHour; hour + habit.MinDurationMinutes <= habit.EndHour; hour++)
+            for (int hour = habit.StartHour; hour + (habit.MinDurationMinutes / 60) <= habit.EndHour; hour++)
             {
                 var start = new TimeOnly(hour, 0);
 
@@ -86,7 +88,9 @@ namespace HabitScheduler.Services
 
         public async Task MarkMissed(int slotId)
         {
-            var slot = await _dbContext.ScheduleSlots.FindAsync(slotId);
+            var slot = await _dbContext.ScheduleSlots
+                .Include(s => s.Habit)
+                .FirstOrDefaultAsync(s => s.Id == slotId);
             if (slot != null)
             {
                 slot.Status = SlotStatus.Missed;
