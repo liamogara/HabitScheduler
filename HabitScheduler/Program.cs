@@ -16,6 +16,12 @@ builder.Services.AddScoped<SchedulerService>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<HabitSchedulerDbContext>();
+    SeedData.Initialize(dbContext);
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
