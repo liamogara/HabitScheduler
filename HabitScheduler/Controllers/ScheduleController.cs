@@ -1,6 +1,5 @@
 ﻿using HabitScheduler.Data;
 using HabitScheduler.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +28,7 @@ namespace HabitScheduler.Controllers
             return Ok();
         }
 
+        [HttpPost("{slotId}/miss")]
         public async Task<IActionResult> Miss(int slotId)
         {
             await _schedulerService.MarkMissed(slotId);
