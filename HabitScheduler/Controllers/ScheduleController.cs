@@ -1,4 +1,5 @@
 ﻿using HabitScheduler.Data;
+using HabitScheduler.DTOs;
 using HabitScheduler.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +50,18 @@ namespace HabitScheduler.Controllers
                 .Where(s => days.Contains(s.Date))
                 .OrderBy(s => s.Date)
                 .ThenBy(s => s.StartTime)
+                .Select(s => new ScheduleSlotDto
+                {
+                    Id = s.Id,
+                    Date = s.Date,
+                    StartTime = s.StartTime,
+                    DurationMinutes = s.DurationMinutes,
+                    Status = s.Status,
+                    HabitId = s.HabitId,
+                    HabitName = s.Habit.Name
+                })
                 .ToListAsync();
+
             return Ok(slots);
         }
     }

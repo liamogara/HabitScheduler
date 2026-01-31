@@ -1,4 +1,5 @@
 ﻿using HabitScheduler.Data;
+using HabitScheduler.DTOs;
 using HabitScheduler.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,16 +28,25 @@ namespace HabitScheduler.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateHabit(Habit habit)
+        public async Task<IActionResult> CreateHabit(CreateHabitDto dto)
         {
+            var habit = new Habit
+            {
+                Name = dto.Name,
+                FrequencyPerWeek = dto.FrequencyPerWeek,
+                MinDurationMinutes = dto.MinDurationMinutes,
+                StartHour = dto.StartHour,
+                EndHour = dto.EndHour,
+                IsActive = dto.IsActive
+            };
             _dbContext.Habits.Add(habit);
             await _dbContext.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetHabits), new { id = habit.Id }, habit);
+            return Ok();
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateHabit(int id, Habit updatedHabit)
+        public async Task<IActionResult> UpdateHabit(int id, CreateHabitDto dto)
         {
             var habit = await _dbContext.Habits.FindAsync(id);
             if (habit == null)
@@ -44,12 +54,12 @@ namespace HabitScheduler.Controllers
                 return NotFound();
             }
 
-            habit.Name = updatedHabit.Name;
-            habit.FrequencyPerWeek = updatedHabit.FrequencyPerWeek;
-            habit.MinDurationMinutes = updatedHabit.MinDurationMinutes;
-            habit.StartHour = updatedHabit.StartHour;
-            habit.EndHour = updatedHabit.EndHour;
-            habit.IsActive = updatedHabit.IsActive;
+            habit.Name = dto.Name;
+            habit.FrequencyPerWeek = dto.FrequencyPerWeek;
+            habit.MinDurationMinutes = dto.MinDurationMinutes;
+            habit.StartHour = dto.StartHour;
+            habit.EndHour = dto.EndHour;
+            habit.IsActive = dto.IsActive;
 
             await _dbContext.SaveChangesAsync();
             return NoContent();
