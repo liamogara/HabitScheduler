@@ -33,21 +33,28 @@ namespace HabitScheduler.Controllers
         public async Task<IActionResult> Miss(int slotId)
         {
             await _schedulerService.MarkMissed(slotId);
-            return Ok();
+            return NoContent();
         }
 
         [HttpPost("{slotId}/complete")]
         public async Task<IActionResult> Complete(int slotId)
         {
             await _schedulerService.MarkCompleted(slotId);
-            return Ok();
+            return NoContent();
         }
 
         [HttpPost("{slotId}/reschedule")]
         public async Task<IActionResult> Reschedule(int slotId)
         {
             await _schedulerService.Reschedule(slotId);
-            return Ok();
+            return NoContent();
+        }
+
+        [HttpPost("{slotId}/move")]
+        public async Task<IActionResult> Move(int slotId, MoveSlotDto dto)
+        {
+            await _schedulerService.Move(slotId, dto.day);
+            return NoContent();
         }
 
         [HttpDelete("{slotId}")]

@@ -105,6 +105,7 @@ namespace HabitScheduler.Services
             
             if (slot != null)
             {
+                slot.Habit.ScheduledSlots.Remove(slot);
                 _dbContext.ScheduleSlots.Remove(slot);
                 await AttemptReschedule(slot.Habit, slot.Date);
                 await _dbContext.SaveChangesAsync();
@@ -130,6 +131,8 @@ namespace HabitScheduler.Services
                     StartTime = start.Value,
                     DurationMinutes = habit.MinDurationMinutes,
                 };
+
+                habit.ScheduledSlots.Add(slot);
                 _dbContext.ScheduleSlots.Add(slot);
 
                 await _dbContext.SaveChangesAsync();
@@ -145,6 +148,35 @@ namespace HabitScheduler.Services
             if (slot != null)
             {
                 slot.Status = SlotStatus.Completed;
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task Move(int slotId, string day)
+        {
+            var slot = await _dbContext.ScheduleSlots
+                .Include(s => s.Habit)
+                .FirstOrDefaultAsync(s => s.Id == slotId);
+            if (slot != null)
+            {
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                var weekStartDate = today.AddDays(-(int)today.DayOfWeek);
+                var date = (day) switch
+                {
+                    "Sat" => weekStartDate,
+                    "Sun" => weekStartDate.AddDays(1),
+                    "Mon" => weekStartDate.AddDays(2),
+                    "Tue" => weekStartDate.AddDays(3),
+                    "Wed" => weekStartDate.AddDays(4),
+                    "Thu" => weekStartDate.AddDays(5),
+                    "Fri" => weekStartDate.AddDays(6),
+                    _ => weekStartDate
+                };
+                var start = FindAvailableTime(date, slot.Habit);
+                if (start == null) return;
+                slot.StartTime = start.Value;
+                slot.Date = date;
+
                 await _dbContext.SaveChangesAsync();
             }
         }
