@@ -114,10 +114,8 @@ namespace HabitScheduler.Services
 
         private async Task AttemptReschedule(Habit habit, DateOnly date)
         {
-            var week = date.AddDays(-(int)date.DayOfWeek);
-
-            var days = Enumerable.Range(0, 7)
-                .Select(offset => week.AddDays(offset))
+            var days = Enumerable.Range(1, (int)date.DayOfWeek)
+                .Select(offset => date.AddDays(offset))
                 .ToList();
 
             foreach (var day in days)
