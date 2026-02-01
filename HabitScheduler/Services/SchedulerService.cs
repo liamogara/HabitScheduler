@@ -95,8 +95,6 @@ namespace HabitScheduler.Services
             {
                 slot.Status = SlotStatus.Missed;
                 await _dbContext.SaveChangesAsync();
-
-                await AttemptReschedule(slot.Habit, slot.Date);
             }
         }
 
@@ -125,6 +123,18 @@ namespace HabitScheduler.Services
 
                 await _dbContext.SaveChangesAsync();
                 return;
+            }
+        }
+
+        public async Task MarkCompleted(int slotId)
+        {
+            var slot = await _dbContext.ScheduleSlots
+                .Include(s => s.Habit)
+                .FirstOrDefaultAsync(s => s.Id == slotId);
+            if (slot != null)
+            {
+                slot.Status = SlotStatus.Completed;
+                await _dbContext.SaveChangesAsync();
             }
         }
 

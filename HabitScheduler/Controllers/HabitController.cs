@@ -37,12 +37,27 @@ namespace HabitScheduler.Controllers
                 MinDurationMinutes = dto.MinDurationMinutes,
                 StartHour = dto.StartHour,
                 EndHour = dto.EndHour,
-                IsActive = dto.IsActive
+                IsActive = true
             };
             _dbContext.Habits.Add(habit);
             await _dbContext.SaveChangesAsync();
 
-            return Ok();
+            return CreatedAtAction(nameof(GetHabits), new { id = habit.Id }, habit);
+        }
+
+        [HttpDelete("{habitId}")]
+        public async Task<IActionResult> DeleteHabit(int habitId)
+        {
+            var habit = await _dbContext.Habits.FindAsync(habitId);
+            if (habit == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.Habits.Remove(habit);
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [HttpPut("{id}")]
@@ -62,6 +77,16 @@ namespace HabitScheduler.Controllers
             habit.IsActive = dto.IsActive;
 
             await _dbContext.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpDelete("habits")]
+        public async Task<IActionResult> ClearHabits()
+        {
+
+            await _dbContext.Habits.ExecuteDeleteAsync();
+            await _dbContext.SaveChangesAsync();
+
             return NoContent();
         }
     }

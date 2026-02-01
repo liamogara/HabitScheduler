@@ -36,6 +36,28 @@ namespace HabitScheduler.Controllers
             return Ok();
         }
 
+        [HttpPost("{slotId}/complete")]
+        public async Task<IActionResult> Complete(int slotId)
+        {
+            await _schedulerService.MarkCompleted(slotId);
+            return Ok();
+        }
+
+        [HttpDelete("{slotId}")]
+        public async Task<IActionResult> DeleteSlot (int slotId)
+        {
+            var slot = await _dbContext.ScheduleSlots.FindAsync(slotId);
+            if (slot == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.ScheduleSlots.Remove(slot);
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         [HttpGet("week")]
         public async Task<IActionResult> GetWeek()
         {
@@ -63,6 +85,16 @@ namespace HabitScheduler.Controllers
                 .ToListAsync();
 
             return Ok(slots);
+        }
+
+        [HttpDelete("week")]
+        public async Task<IActionResult> ClearWeek()
+        {
+            
+            await _dbContext.ScheduleSlots.ExecuteDeleteAsync();
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
