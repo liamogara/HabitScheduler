@@ -56,11 +56,10 @@ namespace HabitScheduler.Services
                     habit.ScheduledSlots.Add(slot);
                     _dbContext.ScheduleSlots.Add(slot);
 
+                    await _dbContext.SaveChangesAsync();
                     slotsToSchedule--;
                 }
             }
-
-            await _dbContext.SaveChangesAsync();
         }
 
         private TimeOnly? FindAvailableTime(DateOnly date, Habit habit)
