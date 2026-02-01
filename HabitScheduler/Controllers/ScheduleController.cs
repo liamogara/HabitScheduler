@@ -43,6 +43,13 @@ namespace HabitScheduler.Controllers
             return Ok();
         }
 
+        [HttpPost("{slotId}/reschedule")]
+        public async Task<IActionResult> Reschedule(int slotId)
+        {
+            await _schedulerService.Reschedule(slotId);
+            return Ok();
+        }
+
         [HttpDelete("{slotId}")]
         public async Task<IActionResult> DeleteSlot (int slotId)
         {

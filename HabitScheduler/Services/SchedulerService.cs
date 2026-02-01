@@ -98,6 +98,20 @@ namespace HabitScheduler.Services
             }
         }
 
+        public async Task Reschedule(int slotId)
+        {
+            var slot = await _dbContext.ScheduleSlots
+                .Include(s => s.Habit)
+                .FirstOrDefaultAsync(s => s.Id == slotId);
+            
+            if (slot != null)
+            {
+                _dbContext.ScheduleSlots.Remove(slot);
+                await AttemptReschedule(slot.Habit, slot.Date);
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
         private async Task AttemptReschedule(Habit habit, DateOnly date)
         {
             var week = date.AddDays(-(int)date.DayOfWeek);
