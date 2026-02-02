@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: habit
+      POSTGRES_PASSWORD: habitpw
+      POSTGRES_DB: habits
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "5000:80"
+    environment:
+      ConnectionStrings__PostgreSQL: "Host=db;Port=5432;Database=habits;Username=habit;Password=habitpw"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
