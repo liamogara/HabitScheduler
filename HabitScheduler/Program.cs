@@ -18,7 +18,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins(
+            "http://localhost:4200",
+            "https://habit-scheduler.netlify.app")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -28,13 +30,16 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<HabitSchedulerDbContext>();
-    SeedData.Initialize(dbContext);
+    var db = scope.ServiceProvider.GetRequiredService<HabitSchedulerDbContext>();
+    db.Database.Migrate();
 }
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<HabitSchedulerDbContext>();
+    SeedData.Initialize(dbContext);
 }
 
 app.UseSwagger();
