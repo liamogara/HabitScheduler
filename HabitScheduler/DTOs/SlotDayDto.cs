@@ -1,6 +1,6 @@
 ﻿namespace HabitScheduler.DTOs
 {
-    public class MoveSlotDto
+    public class SlotDayDto
     {
         public string day { get; set; } = null!;
     }

@@ -46,14 +46,33 @@ namespace HabitScheduler.Controllers
         [HttpPost("{slotId}/reschedule")]
         public async Task<IActionResult> Reschedule(int slotId)
         {
-            await _schedulerService.Reschedule(slotId);
+            var result = await _schedulerService.Reschedule(slotId);
+            if (result is null)
+            {
+                return BadRequest("Failed to reschedule slot.");
+            }
             return NoContent();
         }
 
         [HttpPost("{slotId}/move")]
-        public async Task<IActionResult> Move(int slotId, MoveSlotDto dto)
+        public async Task<IActionResult> Move(int slotId, SlotDayDto dto)
         {
-            await _schedulerService.Move(slotId, dto.day);
+            var result = await _schedulerService.Move(slotId, dto.day);
+            if (result is null)
+            {
+                return BadRequest("Failed to move slot.");
+            }
+            return NoContent();
+        }
+
+        [HttpPost("habit/{habitId}")]
+        public async Task<IActionResult> AddHabit(int habitId, SlotDayDto dto)
+        {
+            var result = await _schedulerService.AddHabit(habitId, dto.day);
+            if (result is null)
+            {
+                return BadRequest("Failed to add habit.");
+            }
             return NoContent();
         }
 
