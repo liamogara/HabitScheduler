@@ -28,6 +28,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseCors("AllowAngular");
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<HabitSchedulerDbContext>();
@@ -40,17 +42,12 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<HabitSchedulerDbContext>();
     SeedData.Initialize(dbContext);
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseHttpsRedirection();
 }
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
-app.UseCors("AllowAngular");
-
-app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
