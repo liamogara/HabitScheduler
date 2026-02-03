@@ -30,12 +30,6 @@ var app = builder.Build();
 
 app.UseCors("AllowAngular");
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<HabitSchedulerDbContext>();
-    db.Database.Migrate();
-}
-
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -45,9 +39,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseHttpsRedirection();
+} else
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<HabitSchedulerDbContext>();
+        db.Database.Migrate();
+    }
 }
 
-app.UseAuthorization();
+    app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
